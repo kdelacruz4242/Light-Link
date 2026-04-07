@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class GoalCrystal : MonoBehaviour
-{
+public class GoalCrystal : MonoBehaviour{
     public bool isActivated = false;
     public AudioSource goalSound;
     public float nextLevelDelay = 1f;
@@ -12,33 +11,30 @@ public class GoalCrystal : MonoBehaviour
     private bool soundPlayed = false;
     private bool levelLoading = false;
 
-    void Start()
-    {
+    void Start(){
         sr = GetComponent<SpriteRenderer>();
     }
 
-    public void Activate()
-    {
+    public void Activate(){
         isActivated = true;
         sr.color = Color.purple;
 
-        if (!soundPlayed && goalSound != null)
-        {
+        // audio clip will play when the goal activates
+        if (!soundPlayed && goalSound != null){
             goalSound.Play();
             soundPlayed = true;
         }
 
-        if (!levelLoading)
-        {
+        // next level will play 
+        if (!levelLoading){
             levelLoading = true;
             StartCoroutine(LoadNextLevel());
         }
     }
 
-    public void Deactivate()
-    {
+    public void Deactivate(){
         if (levelLoading) return;
-
+        
         isActivated = false;
         sr.color = Color.orange;
     }
@@ -48,14 +44,12 @@ public class GoalCrystal : MonoBehaviour
 
     int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
 
-    // If next scene exists → go to it
-    if (currentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings)
-    {
+    // if next scene exists → go to it
+    if (currentSceneIndex + 1 < SceneManager.sceneCountInBuildSettings){
         SceneManager.LoadScene(currentSceneIndex + 1);
     }
-    else
-    {
-        // Otherwise go back to Main Menu (index 0)
+    else{
+        // otherwise go back to Main Menu (index 0)
         SceneManager.LoadScene(0);
     }
     }

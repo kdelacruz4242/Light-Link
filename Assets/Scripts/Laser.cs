@@ -7,12 +7,12 @@ public class Laser : MonoBehaviour
     public float maxDistance = 20f;
     public int maxBounces = 5;
     public AudioSource mirrorBounceSound;
-
     private LineRenderer lr;
     private Collider2D lastMirrorHit;
 
     void Awake()
     {
+        // the laser itselt is a LineRenderer
         lr = GetComponent<LineRenderer>();
     }
 
@@ -20,13 +20,18 @@ public class Laser : MonoBehaviour
     {
         if (startPoint == null) return;
 
+
+        // initialize laser starting position and direction
         Vector2 currentPos = startPoint.position;
         Vector2 direction = Vector2.right;
 
+        // initialize LineRenderer with the starting point
         lr.positionCount = 1;
         lr.SetPosition(0, currentPos);
 
         GoalCrystal[] goals = FindObjectsOfType<GoalCrystal>();
+
+        // reset all goals to inactive at the start of each frame
         foreach (GoalCrystal goal in goals)
         {
             goal.Deactivate();
@@ -34,6 +39,7 @@ public class Laser : MonoBehaviour
 
         for (int i = 0; i < maxBounces; i++)
         {
+             // how the laser reflects off the mirror in realistic way 
             RaycastHit2D hit = Physics2D.Raycast(currentPos, direction, maxDistance);
 
             if (hit.collider != null)
@@ -41,6 +47,7 @@ public class Laser : MonoBehaviour
                 lr.positionCount++;
                 lr.SetPosition(lr.positionCount - 1, hit.point);
 
+                // if player hits that laser, the player dies
                 if (hit.collider.CompareTag("Player"))
                 {
                     hit.collider.GetComponent<PlayerMovement>().Die();
@@ -54,6 +61,7 @@ public class Laser : MonoBehaviour
                     break;
                 }
 
+                // when the laser reaches a mirror the line will bounce off of it 
                 if (hit.collider.CompareTag("Mirror"))
                 {
                     if (mirrorBounceSound != null && hit.collider != lastMirrorHit)

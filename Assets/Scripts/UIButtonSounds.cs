@@ -9,7 +9,7 @@ public class UIButtonSound : MonoBehaviour, IPointerEnterHandler
     {
         if (hoverSound != null)
         {
-            hoverSound.PlayOneShot(hoverSound.clip);
+            hoverSound.PlayOneShot(hoverSound.clip);    // audio sound effect will play when mouse is hovered over buttons
         }
     }
 }

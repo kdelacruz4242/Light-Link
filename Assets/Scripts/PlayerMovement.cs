@@ -1,25 +1,21 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
-{
+public class PlayerMovement : MonoBehaviour{
     public float speed = 5f;
     public float interactRange = 1.5f;
     public float mirrorRotateSpeed = 100f;
     public AudioSource deathSound;
-
     private Rigidbody2D rb;
     private Vector2 movement;
     private SpriteRenderer sr;
     private bool isDead = false;
 
-    void Start()
-    {
+    void Start(){
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
     }
 
-    void Update()
-    {
+    void Update(){
         if (isDead) return;
 
         movement.x = Input.GetAxisRaw("Horizontal");
@@ -27,25 +23,25 @@ public class PlayerMovement : MonoBehaviour
 
         GameObject nearestMirror = FindNearestMirror();
 
-        if (Input.GetKey(KeyCode.E) && nearestMirror != null)
-        {
+
+        // mirrors will rotate smoothly due to Time.deltaTime
+        if (Input.GetKey(KeyCode.E) && nearestMirror != null){
             nearestMirror.transform.Rotate(0f, 0f, mirrorRotateSpeed * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Q) && nearestMirror != null)
-        {
+        if (Input.GetKey(KeyCode.Q) && nearestMirror != null){
             nearestMirror.transform.Rotate(0f, 0f, -mirrorRotateSpeed * Time.deltaTime);
         }
     }
 
-    void FixedUpdate()
-    {
-        if (isDead)
-        {
+    void FixedUpdate(){
+        // If player is dead, stop all movement
+        if (isDead){
             rb.linearVelocity = Vector2.zero;
             return;
         }
-
+        
+        // apply normalized movement so speed stays consistent in all directions
         rb.linearVelocity = movement.normalized * speed;
     }
 
@@ -53,41 +49,41 @@ public class PlayerMovement : MonoBehaviour
     {
         GameObject[] mirrors = GameObject.FindGameObjectsWithTag("Mirror");
 
-        GameObject closest = null;
+        GameObject closest = null; // will store the closest mirror found
         float minDist = Mathf.Infinity;
 
-        foreach (GameObject mirror in mirrors)
-        {
-            float dist = Vector2.Distance(transform.position, mirror.transform.position);
+         // loop through each mirror in the scene
+        foreach (GameObject mirror in mirrors){
+            float dist = Vector2.Distance(transform.position, mirror.transform.position);   // calculate distance between player and current mirror
 
-            if (dist < interactRange && dist < minDist)
-            {
+            // check if mirror is within interaction range and closer than previous ones
+            if (dist < interactRange && dist < minDist){
                 minDist = dist;
                 closest = mirror;
             }
         }
 
-        return closest;
+        return closest; // return the closest valid mirror (or null if none found)
     }
 
-    public void Die()
-    {
+    // when player dies, the player will turn red and make a sound effect before restarting level
+    public void Die(){
+
         if (isDead) return;
         isDead = true;
 
         sr.color = Color.red;
         rb.linearVelocity = Vector2.zero;
 
-        if (deathSound != null)
-        {
+        if (deathSound != null){
             deathSound.Play();
         }
 
         Invoke("RestartLevel", 1.5f);
     }
 
-    void RestartLevel()
-    {
+    // reload scene when player dies (so if theres moved boxes it will reset)
+    void RestartLevel(){
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
         );
